@@ -6,6 +6,7 @@ import arc.util.Log;
 import informatis.core.OverDrawer;
 import informatis.core.Setting;
 import informatis.draws.OverDraws;
+import informatis.ui.BuildNoteManager;
 import informatis.ui.SidebarSwitcher;
 import informatis.ui.TroopingManager;
 import informatis.ui.dialogs.DialogManager;
@@ -43,7 +44,10 @@ public class Informatis extends Mod {
                 if(input.keyTap(numCode)) {
                     if(input.keyDown(KeyCode.altLeft)) TroopingManager.applyTrooping(i);
                     else if(input.keyDown(KeyCode.capsLock)) TroopingManager.updateTrooping(i);
-                    else TroopingManager.selectTrooping(i);
+                    else {
+                        TroopingManager.selectTrooping(i);
+                        BuildNoteManager.selectBuildPlan(i);
+                    }
                     break;
                 }
                 i++;
@@ -55,13 +59,12 @@ public class Informatis extends Mod {
             WindowManager.init();
             DialogManager.init();
             TroopingManager.init();
+            BuildNoteManager.init();
             new SidebarSwitcher(
                 WindowManager.body,
                 DialogManager.body,
                 TroopingManager.body,
-                new Table(Tex.buttonEdge4,  t -> {
-                    t.label(() -> "it's just label lmao");
-                })
+                BuildNoteManager.body
             ).init();
             FragmentManager.init();
             OverDraws.init();

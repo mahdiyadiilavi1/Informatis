@@ -83,7 +83,6 @@ public class TroopingManager {
         Vars.control.input.selectedUnits.each(unit -> seq.add(unit.id));
     }
     public static void selectTrooping(int index) {
-        Vars.control.input.commandMode = true;
         Vars.control.input.selectedUnits.clear();
         for(int id : troops.get(index).toArray()) {
             Unit unit = Groups.unit.getByID(id);
