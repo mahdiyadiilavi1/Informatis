@@ -42,11 +42,13 @@ public class Informatis extends Mod {
             int i = 0;
             for(KeyCode numCode : KeyCode.numbers) {
                 if(input.keyTap(numCode)) {
-                    if(input.keyDown(KeyCode.altLeft)) TroopingManager.applyTrooping(i);
-                    else if(input.keyDown(KeyCode.capsLock)) TroopingManager.updateTrooping(i);
-                    else {
-                        TroopingManager.selectTrooping(i);
-                        BuildNoteManager.selectBuildPlan(i);
+                    if (Vars.control.input.commandMode) {
+                        if (input.keyDown(KeyCode.altLeft)) TroopingManager.applyTrooping(i);
+                        else if (input.keyDown(KeyCode.capsLock)) TroopingManager.updateTrooping(i);
+                        else TroopingManager.selectTrooping(i);
+                    } else {
+                        if (input.keyDown(KeyCode.capsLock)) BuildNoteManager.updateTrooping(i);
+                        else BuildNoteManager.selectBuildPlan(i);
                     }
                     break;
                 }

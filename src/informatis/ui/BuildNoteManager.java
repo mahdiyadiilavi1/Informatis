@@ -5,7 +5,6 @@ import arc.scene.event.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
-import arc.util.*;
 import mindustry.*;
 import mindustry.entities.units.*;
 
@@ -13,6 +12,7 @@ import arc.struct.Queue;
 import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.world.Block;
+import mindustry.world.Build;
 
 public class BuildNoteManager {
     public static Table body;
@@ -28,35 +28,31 @@ public class BuildNoteManager {
 
                 for(int i = 1; i <= 10; i++) {
                     final int finalI = i % 10;
-                    Table ltable = new Table(listItem -> {
+                    list.table(listItem -> {
+                        listItem.touchable = Touchable.enabled;
+                        listItem.clicked(() -> selectBuildPlan(finalI));
                         listItem.left().defaults().grow();
+
                         listItem.add(String.valueOf(finalI))
                                 .fontScale(0.75f)
                                 .width(15).padRight(30);
-                        listItem.table(stack -> stack.add(buildListItem(finalI)))
-                                .padLeft(10)
+                        listItem.table(stack -> stack.add(buildListItem(finalI)).grow())
+                                .width(80).padLeft(10)
                                 .name("listItem-"+finalI);
                         listItem.image(Icon.cancelSmall)
                                 .color(Pal.health)
-                                .size(20).padRight(10)
+                                .size(20).padLeft(10)
                                 .get().clicked(() -> {
                                     plans.get(finalI).clear();
                                     rerenderListItem();
                                 });
                         listItem.image(Icon.upSmall)
                                 .color(Pal.heal)
-                                .size(20).padRight(10)
-                                .get().clicked(() -> {
-                                    plans.set(finalI, copyPlan(Vars.player.unit().plans()));
-                                    rerenderListItem();
-                                });
-                    });
-                    ltable.touchable = Touchable.enabled;
-                    ltable.clicked(() -> selectBuildPlan(finalI));
-
-                    list.add(ltable).pad(10).minWidth(200).row();
+                                .size(20).padLeft(10)
+                                .get().clicked(() -> updateTrooping(finalI));
+                    }).pad(10).row();
                     list.image().height(2f).color(Pal.gray).row();
-                };
+                }
             });
         });
     }
@@ -67,25 +63,27 @@ public class BuildNoteManager {
         return copied;
     }
 
+    public static void updateTrooping(int index) {
+        plans.set(index, copyPlan(Vars.player.unit().plans()));
+        rerenderListItem();
+    }
     public static void selectBuildPlan(int index) {
-        Vars.player.unit().plans(copyPlan(plans.get(index)));
+        for(BuildPlan plan : plans.get(index)) {
+            Vars.player.unit().addBuild(plan.copy());
+        }
     }
     private static Stack buildListItem(int index) {
-        return new Stack() {{
-            IntSet cache = new IntSet();
-            int i = 0;
-            for(BuildPlan plan : plans.get(index)) {
-                Block block = plan.block;
-                if(cache.contains(block.id)) continue;
-                cache.add(block.id);
+        Stack stack = new Stack();
+        IntSet cache = new IntSet();
+        for(BuildPlan plan : plans.get(index)) {
+            Block block = plan.block;
+            if(cache.contains(block.id)) continue;
+            if(cache.size >= 5) break;
+            cache.add(block.id);
 
-                Table iconTable = new Table();
+            stack.add(new Table(iconTable -> {
                 iconTable.right();
-                iconTable.add(new Image() {
-                    {
-                        setDrawable(block.uiIcon);
-                    }
-
+                iconTable.add(new Image(block.uiIcon) {
                     @Override
                     public void draw() {
                         super.draw();
@@ -95,12 +93,10 @@ public class BuildNoteManager {
                         Lines.rect(x - size / 2f, y - size / 2f, width + size, height + size);
                         Draw.reset();
                     }
-                }).size(16).padRight(i * 4);
-                add(iconTable);
-                i++;
-                if(cache.size > 5) break;
-            }
-        }};
+                }).size(16).padRight((cache.size - 1) * 7);
+            }));
+        }
+        return stack;
     }
     private static void rerenderListItem() {
         for(int i = 0; i < 10; i++) {
