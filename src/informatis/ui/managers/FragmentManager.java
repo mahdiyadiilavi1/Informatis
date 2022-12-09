@@ -1,13 +1,19 @@
-package informatis.ui.fragments;
+package informatis.ui.managers;
 
 import arc.scene.ui.layout.Table;
 import arc.struct.Seq;
+import informatis.ui.fragments.ElementViewFragment;
+import informatis.ui.fragments.QuickSchemFragment;
+import informatis.ui.fragments.ServerSearchFragment;
+import informatis.ui.fragments.TileInfoFragment;
 
 import static arc.Core.scene;
 import static mindustry.Vars.ui;
 
-public class FragmentManager {
-    public static void init() {
+public class FragmentManager extends BaseManager {
+    private static FragmentManager instance;
+
+    private FragmentManager() {
         //layout debug
         Seq.with(scene.root,
                 ui.picker, ui.editor, ui.controls, ui.restart, ui.join, ui.discord,
@@ -19,5 +25,12 @@ public class FragmentManager {
         new QuickSchemFragment();
         new TileInfoFragment();
         new ServerSearchFragment();
+
+        body = new Table();
+    }
+
+    public static FragmentManager getInstance() {
+        if(instance == null) instance = new FragmentManager();
+        return instance;
     }
 }

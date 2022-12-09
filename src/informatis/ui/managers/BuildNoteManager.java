@@ -1,24 +1,23 @@
-package informatis.ui;
+package informatis.ui.managers;
 
-import arc.graphics.g2d.*;
 import arc.scene.event.*;
-import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
 import arc.struct.*;
 import mindustry.*;
+import mindustry.ctype.ContentType;
 import mindustry.entities.units.*;
 
 import arc.struct.Queue;
 import mindustry.gen.Icon;
 import mindustry.graphics.Pal;
 import mindustry.world.Block;
-import mindustry.world.Build;
 
-public class BuildNoteManager {
-    public static Table body;
-    private static final Seq<Queue<BuildPlan>> plans = new Seq<>(10);
+public class BuildNoteManager extends BaseManager {
+    private final Seq<Queue<BuildPlan>> plans = new Seq<>(10);
+    private static BuildNoteManager instance;
 
-    public static void init() {
+
+    private BuildNoteManager() {
         for(int i = 0; i < 10; i++) plans.add(new Queue<>());
         body = new Table(t -> {
             t.defaults().growX();
@@ -36,7 +35,7 @@ public class BuildNoteManager {
                         listItem.add(String.valueOf(finalI))
                                 .fontScale(0.75f)
                                 .width(15).padRight(30);
-                        listItem.table(stack -> stack.add(buildListItem(finalI)).grow())
+                        listItem.table(stack -> stack.add(buildListItem(finalI)).grow().width(80))
                                 .width(80).padLeft(10)
                                 .name("listItem-"+finalI);
                         listItem.image(Icon.cancelSmall)
@@ -56,49 +55,49 @@ public class BuildNoteManager {
             });
         });
     }
+    public static BuildNoteManager getInstance() {
+        if(instance == null) instance = new BuildNoteManager();
+        return instance;
+    }
 
-    private static Queue<BuildPlan> copyPlan(Queue<BuildPlan> target) {
+    private Queue<BuildPlan> copyPlan(Queue<BuildPlan> target) {
         Queue<BuildPlan> copied = new Queue<>(target.size);
         for(BuildPlan plan : target) copied.add(plan.copy());
         return copied;
     }
 
-    public static void updateTrooping(int index) {
+    public void updateTrooping(int index) {
         plans.set(index, copyPlan(Vars.player.unit().plans()));
         rerenderListItem();
     }
-    public static void selectBuildPlan(int index) {
+    public void selectBuildPlan(int index) {
         for(BuildPlan plan : plans.get(index)) {
             Vars.player.unit().addBuild(plan.copy());
         }
     }
-    private static Stack buildListItem(int index) {
-        Stack stack = new Stack();
+    private Table buildListItem(int index) {
+        Table table = new Table();
         IntSet cache = new IntSet();
         for(BuildPlan plan : plans.get(index)) {
             Block block = plan.block;
             if(cache.contains(block.id)) continue;
-            if(cache.size >= 5) break;
             cache.add(block.id);
-
-            stack.add(new Table(iconTable -> {
-                iconTable.right();
-                iconTable.add(new Image(block.uiIcon) {
-                    @Override
-                    public void draw() {
-                        super.draw();
-
-                        int size = 4;
-                        Lines.stroke(Scl.scl(2f), Pal.gray.cpy().a(parentAlpha));
-                        Lines.rect(x - size / 2f, y - size / 2f, width + size, height + size);
-                        Draw.reset();
-                    }
-                }).size(16).padRight((cache.size - 1) * 7);
-            }));
+            if(cache.size >= 5) continue;
+            table.image(block.uiIcon).size(16);
         }
-        return stack;
+        if(cache.size >= 5) {
+            table.row();
+            table.add("...").center().growX().tooltip(toolt -> {
+                toolt.add();
+                int[] cs = cache.iterator().toArray().toArray();
+                for(int id : cs) {
+                    toolt.image(((Block) Vars.content.getByID(ContentType.block, id)).uiIcon).size(16);
+                }
+            });
+        }
+        return table;
     }
-    private static void rerenderListItem() {
+    private void rerenderListItem() {
         for(int i = 0; i < 10; i++) {
             Table table = body.find("listItem-"+i);
             table.clear();

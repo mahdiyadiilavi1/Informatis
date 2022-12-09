@@ -20,7 +20,6 @@ import mindustry.world.Tile;
 
 import java.lang.reflect.*;
 
-import static informatis.SVars.*;
 import static arc.Core.*;
 import static mindustry.Vars.*;
 

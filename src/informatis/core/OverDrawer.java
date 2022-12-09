@@ -1,6 +1,5 @@
 package informatis.core;
 
-import informatis.draws.*;
 import arc.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
@@ -8,7 +7,7 @@ import arc.math.*;
 import arc.math.geom.*;
 import arc.util.*;
 import informatis.ui.windows.UnitWindow;
-import informatis.ui.windows.WindowManager;
+import informatis.ui.managers.WindowManager;
 import mindustry.game.*;
 import mindustry.gen.*;
 import mindustry.graphics.*;
@@ -57,7 +56,7 @@ public class OverDrawer {
                 Position to = getTarget();
                 if(to == from || to == null) to = input.mouseWorld();
                 if(player.unit() instanceof BlockUnitUnit bu) Tmp.v1.set(bu.x() + bu.tile().block.offset, bu.y() + bu.tile().block.offset).sub(to.getX(), to.getY()).limit(bu.tile().block.size * tilesize +  sin + 0.5f);
-                else Tmp.v1.set(from.x(), from.y()).sub(to.getX(), to.getY()).limit((player.unit()==null?0:player.unit().hitSize) +  sin + 0.5f);
+                else Tmp.v1.set(from.x(), from.y()).sub(to.getX(), to.getY()).limit((player.unit() == null ? 0 : player.unit().hitSize) +  sin + 0.5f);
 
                 float x2 = from.x() - Tmp.v1.x, y2 = from.y() - Tmp.v1.y, x1 = to.getX() + Tmp.v1.x, y1 = to.getY() + Tmp.v1.y;
                 int segs = (int) (to.dst(from.x(), from.y()) / tilesize);

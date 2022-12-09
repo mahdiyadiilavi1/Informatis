@@ -1,27 +1,19 @@
 package informatis;
 
-import arc.input.KeyCode;
-import arc.scene.ui.layout.Table;
-import arc.util.Log;
-import informatis.core.OverDrawer;
-import informatis.core.Setting;
-import informatis.draws.OverDraws;
-import informatis.ui.BuildNoteManager;
-import informatis.ui.SidebarSwitcher;
-import informatis.ui.TroopingManager;
-import informatis.ui.dialogs.DialogManager;
-import informatis.ui.dialogs.ResourcePreviewDialog;
-import informatis.ui.fragments.FragmentManager;
-import informatis.ui.windows.*;
 import arc.*;
+import arc.input.*;
+
+import informatis.core.*;
+import informatis.draws.*;
+import informatis.ui.*;
+import informatis.ui.managers.*;
+import informatis.ui.windows.*;
+
 import mindustry.*;
 import mindustry.game.EventType.*;
-import mindustry.gen.Icon;
-import mindustry.gen.Tex;
 import mindustry.mod.*;
 
 import static arc.Core.*;
-import static informatis.ui.windows.WindowManager.windows;
 
 public class Informatis extends Mod {
     @Override
@@ -43,12 +35,12 @@ public class Informatis extends Mod {
             for(KeyCode numCode : KeyCode.numbers) {
                 if(input.keyTap(numCode)) {
                     if (Vars.control.input.commandMode) {
-                        if (input.keyDown(KeyCode.altLeft)) TroopingManager.applyTrooping(i);
-                        else if (input.keyDown(KeyCode.capsLock)) TroopingManager.updateTrooping(i);
-                        else TroopingManager.selectTrooping(i);
+                        if (input.keyDown(KeyCode.altLeft)) TroopingManager.getInstance().applyTrooping(i);
+                        else if (input.keyDown(KeyCode.capsLock)) TroopingManager.getInstance().updateTrooping(i);
+                        else TroopingManager.getInstance().selectTrooping(i);
                     } else {
-                        if (input.keyDown(KeyCode.capsLock)) BuildNoteManager.updateTrooping(i);
-                        else BuildNoteManager.selectBuildPlan(i);
+                        if (input.keyDown(KeyCode.capsLock)) BuildNoteManager.getInstance().updateTrooping(i);
+                        else BuildNoteManager.getInstance().selectBuildPlan(i);
                     }
                     break;
                 }
@@ -58,22 +50,18 @@ public class Informatis extends Mod {
 
         Events.on(ClientLoadEvent.class, e -> {
             Setting.init();
-            WindowManager.init();
-            DialogManager.init();
-            TroopingManager.init();
-            BuildNoteManager.init();
-            new SidebarSwitcher(
-                WindowManager.body,
-                DialogManager.body,
-                TroopingManager.body,
-                BuildNoteManager.body
-            ).init();
-            FragmentManager.init();
             OverDraws.init();
             OverDrawer.init();
-
-            //TODO - SVars.init()?
-            SVars.pathfinder = new informatis.core.Pathfinder();
+            SVars.init();
+            Vars.ui.hudGroup.addChild(
+                new SidebarSwitcher(
+                    WindowManager.getInstance().body,
+                    DialogManager.getInstance().body,
+                    TroopingManager.getInstance().body,
+                    BuildNoteManager.getInstance().body,
+                    FragmentManager.getInstance().body
+                )
+            );
         });
     }
 }

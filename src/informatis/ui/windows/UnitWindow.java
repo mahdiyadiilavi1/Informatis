@@ -55,12 +55,19 @@ public class UnitWindow extends Window {
     final Bits statuses = new Bits();
     public Teamc lastTarget, target;
     public boolean locked;
-    Seq<BarData> data = new Seq<>();
+    Seq<BarData> data;
     public static UnitWindow currentWindow;
 
     public UnitWindow() {
         super(Icon.units, "unit");
         currentWindow = this;
+        target = getTarget();
+        data = new Seq<>();
+        try {
+            data = getInfo(target);
+        } catch (IllegalAccessException | NoSuchFieldException e) {
+            throw new RuntimeException(e);
+        }
     }
 
     @Override

@@ -4,9 +4,7 @@ import arc.func.*;
 import arc.graphics.*;
 import arc.graphics.g2d.*;
 import arc.input.*;
-import arc.scene.event.ClickListener;
-import arc.scene.event.InputEvent;
-import arc.scene.event.InputListener;
+import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.*;
 import arc.scene.ui.layout.*;
@@ -21,7 +19,7 @@ import java.lang.reflect.Field;
 
 
 public class ResourcePreviewDialog extends BaseDialog {
-    boolean showName = false, showAllFields = false;
+    boolean showName = false;
     int currentTab = 0;
 
     public ResourcePreviewDialog() {

@@ -9,6 +9,7 @@ import arc.scene.event.*;
 import arc.scene.style.*;
 import arc.scene.ui.layout.*;
 import arc.util.*;
+import informatis.ui.managers.WindowManager;
 import mindustry.gen.*;
 import mindustry.ui.*;
 
@@ -66,7 +67,7 @@ public class Window extends Table {
                 b.setBackground(Tex.buttonEdge3);
                 b.button(Icon.cancel, Styles.emptyi, () -> {
                     shown = false;
-                    if(!only) WindowManager.windows.get(getClass()).remove(this);
+                    if(!only) WindowManager.getInstance().windows.get(getClass()).remove(this);
                 }).fill();
             })
                 .width(80f)

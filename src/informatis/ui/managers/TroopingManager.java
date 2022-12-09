@@ -1,30 +1,20 @@
-package informatis.ui;
+package informatis.ui.managers;
 
-import arc.graphics.Color;
-import arc.scene.ui.Image;
-import arc.scene.ui.Label;
-import arc.scene.ui.layout.Stack;
 import arc.scene.ui.layout.Table;
 import arc.struct.IntSeq;
-import arc.struct.ObjectIntMap;
 import arc.struct.Seq;
-import arc.util.Log;
-import arc.util.Scaling;
 import mindustry.Vars;
 import mindustry.gen.Groups;
-import mindustry.gen.Healthc;
 import mindustry.gen.Icon;
 import mindustry.gen.Unit;
 import mindustry.graphics.Pal;
-import mindustry.input.InputHandler;
-import mindustry.type.UnitType;
 import mindustry.ui.Styles;
 
-public class TroopingManager {
-    public static Table body;
-    static Seq<IntSeq> troops = new Seq<>(10);
+public class TroopingManager extends BaseManager {
+    Seq<IntSeq> troops = new Seq<>(10);
+    private static TroopingManager instance;
 
-    public static void init() {
+    private TroopingManager() {
         for (int i = 0; i < 10; i++) troops.add(new IntSeq());
 
         body = new Table(t -> {
@@ -78,18 +68,22 @@ public class TroopingManager {
         });
     }
 
-    public static void applyTrooping(int index) {
+    public static TroopingManager getInstance() {
+        if(instance == null) instance = new TroopingManager();
+        return instance;
+    }
+    public void applyTrooping(int index) {
         IntSeq seq = troops.get(index);
         Vars.control.input.selectedUnits.each(unit -> seq.add(unit.id));
     }
-    public static void selectTrooping(int index) {
+    public void selectTrooping(int index) {
         Vars.control.input.selectedUnits.clear();
         for(int id : troops.get(index).toArray()) {
             Unit unit = Groups.unit.getByID(id);
             if(unit != null) Vars.control.input.selectedUnits.add(unit);
         }
     }
-    public static void updateTrooping(int index) {
+    public void updateTrooping(int index) {
         IntSeq seq = troops.get(index);
         seq.clear();
         Vars.control.input.selectedUnits.each(unit -> seq.add(unit.id));
